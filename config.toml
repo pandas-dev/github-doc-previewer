@@ -1,0 +1,17 @@
+previews_path = "/var/doc-previewer"
+retention_days = 14
+max_artifact_size = 524288000
+
+[server]
+address = "0.0.0.0"
+port = 8000
+publish_url = "https://doc-previewer.pydata.org/"
+
+[github]
+entrypoint = "https://api.github.com/repos/"
+token = "xxxxx"
+allowed_owners = [ "pydata", "pandas-dev" ]
+
+[log]
+level = "info"
+format = "%a %{User-Agent}i"
