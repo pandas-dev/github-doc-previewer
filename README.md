@@ -32,7 +32,7 @@ curl -sLO https://github.com/pandas-dev/github-doc-previewer/releases/download/v
 To start the server:
 
 ```
-nohub docs-previewer -c /path/to/config.toml > /path/to/log &
+nohup doc-previewer > /var/log/doc-previewer.log 2>&1 &
 ```
 
 ## Configuration
