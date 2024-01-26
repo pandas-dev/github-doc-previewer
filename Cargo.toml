@@ -28,6 +28,6 @@ depends = "$auto"
 section = "utility"
 priority = "optional"
 assets = [
-    ["target/release/doc-previewer", "usr/bin", "755"],
+    ["target/release/doc-previewer", "usr/bin/", "755"],
     ["config.toml", "etc/doc-previewer/", "644"],
 ]
