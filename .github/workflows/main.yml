@@ -1,0 +1,15 @@
+on: [push, pull_request]
+
+name: Main
+
+jobs:
+  check:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Compile
+        run: cargo build --release
+      # TODO install cargo-deb
+      - name: Package .deb
+        run: cargo deb
