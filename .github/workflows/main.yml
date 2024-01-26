@@ -8,8 +8,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Update rustup
+        run: rustup update
       - name: Compile
         run: cargo build --release
-      # TODO install cargo-deb
+      - name: Install cargo-deb
+        run: cargo install cargo-deb
       - name: Package .deb
         run: cargo deb
