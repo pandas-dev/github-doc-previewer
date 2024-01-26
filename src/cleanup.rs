@@ -29,7 +29,13 @@ pub async fn clean_up_old_previews(target_dir: &Path,
                                    &preview_path,
                                    last_modified,
                                    retention_days);
-                        fs::remove_dir_all(&preview_path)?;
+                        if let Err(e) = fs::remove_dir_all(&preview_path) {
+                            // PermissionError does not report the failing path
+                            // Showing it here in the logs
+                            log::error!("Unable to delete {:?}", &preview_path);
+                            return Err(errors::PreviewerError::IOError(e));
+
+                        }
                         deletion_counter += 1;
                     }
                 }
