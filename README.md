@@ -24,9 +24,9 @@ A package is provided for Debian based systems. It can be installed with
 the next command:
 
 ```
-curl -sLO https://github.com/pandas-dev/github-doc-previewer/releases/download/v0.1.0/doc-previewer_0.1.0-1_amd64.deb \
-    && sudo dpkg -i doc-previewer_0.1.0-1_amd64.deb \
-    && rm doc-previewer_0.1.0-1_amd64.deb
+curl -sLO https://github.com/pandas-dev/github-doc-previewer/releases/download/v0.1.1/doc-previewer_0.1.1-1_amd64.deb \
+    && sudo dpkg -i doc-previewer_0.1.1-1_amd64.deb \
+    && rm doc-previewer_0.1.1-1_amd64.deb
 ```
 
 To start the server:
