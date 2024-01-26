@@ -3,7 +3,7 @@ on: [push, pull_request]
 name: Main
 
 jobs:
-  check:
+  build:
     name: Build
     runs-on: ubuntu-latest
     steps:
@@ -16,7 +16,7 @@ jobs:
         run: cargo install cargo-deb
       - name: Package .deb
         run: cargo deb
-  check:
+  lint:
     name: Lint
     runs-on: ubuntu-latest
     steps:
