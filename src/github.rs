@@ -34,9 +34,9 @@ async fn last_commit_from_pr(client: &Client,
                     json_obj)
             );
         }
-        None => { return Err(PreviewerError::ResponseContentError(
-                             "No commits found".to_owned(),
-                             json_obj)) }
+        None => { Err(PreviewerError::ResponseContentError(
+                     "No commits found".to_owned(),
+                     json_obj)) }
     }
 }
 
@@ -47,9 +47,9 @@ async fn last_commit_from_pr(client: &Client,
 fn extract_run_id_from_detail_url(url: &str) -> Result<u64, PreviewerError> {
     let pattern = "/actions/runs/";
 
-    if let Some(run_id_start_idx) = url.find(&pattern) {
+    if let Some(run_id_start_idx) = url.find(pattern) {
         let url_end = &url[run_id_start_idx + pattern.len()..];
-        if let Some(run_id_end_idx) = url_end.find("/") {
+        if let Some(run_id_end_idx) = url_end.find('/') {
             if let Ok(run_id) = url_end[..run_id_end_idx].parse::<u64>() {
                 return Ok(run_id);
             }
@@ -70,7 +70,7 @@ async fn run_id_from_commit(client: &Client,
         .and_then(|jobs| jobs.iter().find(|job| job["name"] == "Doc Build and Upload")) {
             Some(job) => {
                 if let Some(detail_url) = job["details_url"].as_str() {
-                    extract_run_id_from_detail_url(&detail_url)
+                    extract_run_id_from_detail_url(detail_url)
                 } else {
                     Err(PreviewerError::ResponseContentError(
                         "details_url not found".to_owned(),
@@ -97,21 +97,21 @@ async fn artifact_url_from_run_id(client: &Client,
         Some(artifacts) => {
             if artifacts.len() == 1 {
                 if let Some(artifact_url) = artifacts[0]["archive_download_url"].as_str() {
-                    return Ok(artifact_url.to_owned());
+                    Ok(artifact_url.to_owned())
                 } else {
-                    return Err(PreviewerError::ResponseContentError(
-                               "artifact url is not a string".to_owned(),
-                               json_obj));
+                    Err(PreviewerError::ResponseContentError(
+                        "artifact url is not a string".to_owned(),
+                        json_obj))
                 }
             } else {
-                return Err(PreviewerError::ResponseContentError(
-                           format!("Expected 1 artifact, {} found", artifacts.len()),
-                           json_obj));
+                Err(PreviewerError::ResponseContentError(
+                format!("Expected 1 artifact, {} found", artifacts.len()),
+                json_obj))
             }
         }
-        None => { return Err(PreviewerError::ResponseContentError(
-                             "no artifacts found".to_owned(),
-                             json_obj)) }
+        None => { Err(PreviewerError::ResponseContentError(
+                      "no artifacts found".to_owned(),
+                      json_obj)) }
     }
 }
 
@@ -124,7 +124,7 @@ async fn download_artifact(client: &Client,
     let mut resp = client.get(url).send().await?;
     let artifact_content = resp.body().limit(max_artifact_size).await?;
     let mut zip_archive = zip::ZipArchive::new(Cursor::new(artifact_content))?;
-    zip_archive.extract(&target_dir)?;
+    zip_archive.extract(target_dir)?;
 
     // Temporary creating a file inside the directory, so the directory mtime is updated
     // This will make sure the directory is not cleaned up when it has recent changes
@@ -144,24 +144,24 @@ pub async fn publish_artifact(client: &Client,
 
     log::info!("[PR {}] Preview requested", pull_request_number);
 
-    let last_commit = last_commit_from_pr(&client,
-                                          &base_api_url,
+    let last_commit = last_commit_from_pr(client,
+                                          base_api_url,
                                           pull_request_number).await?;
     log::info!("[PR {}] Last commit: {}", pull_request_number, last_commit);
 
-    let run_id = run_id_from_commit(&client,
-                                    &base_api_url,
+    let run_id = run_id_from_commit(client,
+                                    base_api_url,
                                     &last_commit).await?;
     log::info!("[PR {}] Run id: {}", pull_request_number, run_id);
 
-    let artifact_url = artifact_url_from_run_id(&client,
-                                                &base_api_url,
+    let artifact_url = artifact_url_from_run_id(client,
+                                                base_api_url,
                                                 run_id).await?;
     log::info!("[PR {}] Artifact url: {}", pull_request_number, artifact_url);
 
 
     log::info!("[PR {}] Starting artifact download", pull_request_number);
-    download_artifact(&client, &artifact_url, &target_dir, max_artifact_size).await?;
+    download_artifact(client, &artifact_url, target_dir, max_artifact_size).await?;
     log::info!("[PR {}] Artifact downloaded to {:?}", pull_request_number, target_dir);
 
     Ok(())

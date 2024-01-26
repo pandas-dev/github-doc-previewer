@@ -25,7 +25,6 @@
 use std::fs;
 use std::path::Path;
 use serde_derive::Deserialize;
-use toml;
 
 const PREVIEWS_PATH: &str = "/var/doc-previewer";
 const RETENTION_DAYS: f64 = 14.;
@@ -98,10 +97,9 @@ pub struct SettingsPerThread {
 
 impl Settings {
     pub fn load(fname: &Path) -> Self {
-        let config_content = fs::read_to_string(fname).expect(&format!(
-            "Configuration file {:?} not found",
-            fname
-        ));
+        let config_content = fs::read_to_string(fname).unwrap_or_else(
+            |_| panic!("Configuration file {:?} not found", fname)
+        );
         let config: TomlConfig = toml::from_str(&config_content).unwrap();
         let settings = Settings {
             server_address: config.server.address.unwrap_or(SERVER_ADDRESS.to_owned()),

@@ -1,8 +1,6 @@
 use std::path::Path;
-use log;
 use actix_web::{post, App, HttpResponse, HttpServer, Responder,
                 web, rt, middleware::Logger};
-use env_logger;
 use awc::Client;
 use clap::Parser;
 
@@ -41,8 +39,8 @@ async fn preview_handler(params: web::Path<(String, String, u64)>,
     );
 
     let target_dir = Path::new(&settings.previews_path)
-                        .join(&github_owner)
-                        .join(&github_repo)
+                        .join(github_owner)
+                        .join(github_repo)
                         .join(pull_request_number.to_string());
 
     let publish_url = format!(
@@ -73,7 +71,7 @@ async fn preview_handler(params: web::Path<(String, String, u64)>,
                     }
                 }
             });
-            HttpResponse::Ok().body(format!("{}", &publish_url))
+            HttpResponse::Ok().body(publish_url)
         }
         Err(e) => {
             log::error!("[PR {}] {:?}", pull_request_number, e);
