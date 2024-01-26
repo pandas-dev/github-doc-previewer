@@ -11,7 +11,7 @@
 /// [server]
 /// address = "0.0.0.0"
 /// port = 8000
-/// publish_url = "https://doc-previewer.pydata.org/"
+/// url = "https://doc-previewer.pydata.org/"
 ///
 /// [github]
 /// entrypoint = "https://api.github.com/repos/"
