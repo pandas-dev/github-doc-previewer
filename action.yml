@@ -1,31 +1,29 @@
 name: "Doc Previewer"
 description: "Publish a preview of the documentation in a GitHub repository artifact"
 inputs:
-  server:
+  previewer-server:
     description: "URL of the server where the preview will be published"
     required: true
-  job:
+  artifact-job:
     description: "Name of the GitHub actions job where the artifact will be uploaded"
     required: true
-  token:
+  github-token:
     description: "GitHub token available as the `secrets.GITHUB_TOKEN` variable"
     required: true
 runs:
   using: "composite"
   steps:
     - name: "Call Doc Previewer Webhook"
+      id: call-previewer
       shell: bash
       env:
-        PREVIEWER_URL: "${{ inputs.server }}/preview/${{ github.repository }}/${{ github.event.issue.number }}"
+        PREVIEWER_URL: "${{ inputs.previewer-server }}/preview/${{ github.repository }}/${{ github.event.issue.number }}"
+        ARTIFACT_JOB: "${{ inputs.artifact-job }}"
+      run: echo "previewer-response=$(curl -X POST -f --data-urlencode \"job=${JOB}\" ${PREVIEWER_URL})" >> "$GITHUB_OUTPUT"
+    - name: "Add GitHub Comment"
+      shell: bash
+      env:
         ADD_COMMENT_URL: "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.issue.number }}/comments"
-        GITHUB_TOKEN: "${{ inputs.token }}"
-        ARTIFACT_JOB: "${{ inputs.job }}"
-      run: |
-          PREVIEWER_RESPONSE=$(curl -X POST --data-urlencode "job=${JOB}" ${PREVIEWER_URL})
-          if [[ $? ]]; then
-            curl -H "Authorization: token ${GITHUB_TOKEN}" \
-                 -d '{"body": "${PREVIEWER_RESPONSE}"}' \
-                 ${ADD_COMMENT_URL}
-          else
-            echo $PREVIEWER_RESPONSE
-          fi
+        AUTHORIZATION_HEADER: "Authorization: token ${{ inputs.github_token }}"
+        PREVIEWER_RESPONSE: "${{ steps.call-previewer.outputs.previewer-response }}"
+      run: curl -H "${AUTHORIZATION_HEADER}" -d "{\"body\": \"${PREVIEWER_RESPONSE}\"}" ${ADD_COMMENT_URL}
