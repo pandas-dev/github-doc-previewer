@@ -8,7 +8,7 @@ inputs:
     description: "Name of the GitHub actions job where the artifact will be uploaded"
     required: true
   token:
-    description: "GitHub token available as ${{ secrets.GITHUB_TOKEN }} required to create a comment"
+    description: "GitHub token available as the `secrets.GITHUB_TOKEN` variable"
     required: true
 runs:
   using: "composite"
