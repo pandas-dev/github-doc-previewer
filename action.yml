@@ -1,0 +1,27 @@
+name: "Doc Previewer"
+description: "Publish a preview of the documentation in a GitHub repository artifact"
+inputs:
+  server:
+    description: "URL of the server where the preview will be published"
+    required: true
+  job:
+    description: "Name of the GitHub actions job where the artifact will be uploaded"
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: "Call Doc Previewer Webhook"
+      shell: bash
+      env:
+        PREVIEWER_URL: "${{ inputs.server }}/preview/${{ github.repository }}/${{ github.event.issue.number }}?job=${{ inputs.job }}"
+        ADD_COMMENT_URL: "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.issue.number }}/comments"
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+          PREVIEWER_RESPONSE=$(curl -X POST ${PREVIEWER_URL})
+          if [[ $? ]]; then
+            curl -H "Authorization: token ${GITHUB_TOKEN}" \
+                 -d '{"body": "${PREVIEWER_RESPONSE}"}' \
+                 ${ADD_COMMENT_URL}
+          else
+            echo $PREVIEWER_RESPONSE
+          fi
