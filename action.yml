@@ -16,11 +16,12 @@ runs:
     - name: "Call Doc Previewer Webhook"
       shell: bash
       env:
-        PREVIEWER_URL: "${{ inputs.server }}/preview/${{ github.repository }}/${{ github.event.issue.number }}?job=${{ inputs.job }}"
+        PREVIEWER_URL: "${{ inputs.server }}/preview/${{ github.repository }}/${{ github.event.issue.number }}"
         ADD_COMMENT_URL: "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.issue.number }}/comments"
         GITHUB_TOKEN: "${{ inputs.token }}"
+        ARTIFACT_JOB: "${{ inputs.job }}"
       run: |
-          PREVIEWER_RESPONSE=$(curl -X POST "${PREVIEWER_URL}")
+          PREVIEWER_RESPONSE=$(curl -X POST --data-urlencode="job=${JOB}" ${PREVIEWER_URL})
           if [[ $? ]]; then
             curl -H "Authorization: token ${GITHUB_TOKEN}" \
                  -d '{"body": "${PREVIEWER_RESPONSE}"}' \
