@@ -20,7 +20,7 @@ runs:
         ADD_COMMENT_URL: "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.issue.number }}/comments"
         GITHUB_TOKEN: "${{ inputs.token }}"
       run: |
-          PREVIEWER_RESPONSE=$(curl -X POST ${PREVIEWER_URL})
+          PREVIEWER_RESPONSE=$(curl -X POST "${PREVIEWER_URL}")
           if [[ $? ]]; then
             curl -H "Authorization: token ${GITHUB_TOKEN}" \
                  -d '{"body": "${PREVIEWER_RESPONSE}"}' \
