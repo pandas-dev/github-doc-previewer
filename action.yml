@@ -21,7 +21,7 @@ runs:
         GITHUB_TOKEN: "${{ inputs.token }}"
         ARTIFACT_JOB: "${{ inputs.job }}"
       run: |
-          PREVIEWER_RESPONSE=$(curl -X POST --data-urlencode="job=${JOB}" ${PREVIEWER_URL})
+          PREVIEWER_RESPONSE=$(curl -X POST --data-urlencode "job=${JOB}" ${PREVIEWER_URL})
           if [[ $? ]]; then
             curl -H "Authorization: token ${GITHUB_TOKEN}" \
                  -d '{"body": "${PREVIEWER_RESPONSE}"}' \
