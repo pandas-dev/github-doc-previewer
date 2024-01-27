@@ -16,7 +16,11 @@ runs:
       env:
         PREVIEWER_URL: "${{ inputs.previewer-server }}/preview/${{ github.repository }}/${{ github.event.issue.number }}"
         ARTIFACT_JOB: ${{ inputs.artifact-job }}
-      run: echo "previewer-response=$(curl -X POST -f --data-urlencode \"job=${ARTIFACT_JOB}\" ${PREVIEWER_URL})" >> "$GITHUB_OUTPUT"
+      run: |
+        PREVIEWER_RESPONSE=$(curl -X POST -f --data-urlencode \"job=${ARTIFACT_JOB}\" ${PREVIEWER_URL})
+        EXIT_CODE=$?
+        echo "previewer-response=${PREVIEWER_RESPONSE}" | tee -a "$GITHUB_OUTPUT"
+        exit ${EXIT_CODE}
     - name: "Add GitHub Comment"
       shell: bash
       env:
@@ -24,4 +28,4 @@ runs:
         GITHUB_TOKEN: ${{ github.token }}
         PREVIEWER_RESPONSE: ${{ steps.call-previewer.outputs.previewer-response }}
       run: |
-        curl -H "Authorization: Bearer ${GITHUB_TOKEN}" -d '{"body": "${{ env.PREVIEWER_RESPONSE }}"}' ${ADD_COMMENT_URL}
+        curl -f -H "Authorization: Bearer ${GITHUB_TOKEN}" -d '{"body": "${{ env.PREVIEWER_RESPONSE }}"}' ${ADD_COMMENT_URL}
