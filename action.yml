@@ -7,9 +7,6 @@ inputs:
   artifact-job:
     description: "Name of the GitHub actions job where the artifact will be uploaded"
     required: true
-  github-token:
-    description: "GitHub token available as the `secrets.GITHUB_TOKEN` variable"
-    required: true
 runs:
   using: "composite"
   steps:
@@ -19,12 +16,12 @@ runs:
       env:
         PREVIEWER_URL: "${{ inputs.previewer-server }}/preview/${{ github.repository }}/${{ github.event.issue.number }}"
         ARTIFACT_JOB: ${{ inputs.artifact-job }}
-      run: echo "previewer-response=$(curl -X POST -f --data-urlencode \"job=${JOB}\" ${PREVIEWER_URL})" >> "$GITHUB_OUTPUT"
+      run: echo "previewer-response=$(curl -X POST -f --data-urlencode \"job=${ARTIFACT_JOB}\" ${PREVIEWER_URL})" >> "$GITHUB_OUTPUT"
     - name: "Add GitHub Comment"
       shell: bash
       env:
         ADD_COMMENT_URL: "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.issue.number }}/comments"
-        GITHUB_TOKEN: ${{ inputs.github_token }}
+        GITHUB_TOKEN: ${{ github.token }}
         PREVIEWER_RESPONSE: ${{ steps.call-previewer.outputs.previewer-response }}
       run: |
-        curl -H "Authorization: token ${GITHUB_TOKEN}" -d '{"body": "${{ env.PREVIEWER_RESPONSE }}"}' ${ADD_COMMENT_URL}
+        curl -H "Authorization: Bearer ${GITHUB_TOKEN}" -d '{"body": "${{ env.PREVIEWER_RESPONSE }}"}' ${ADD_COMMENT_URL}
