@@ -20,7 +20,7 @@ struct PreviewParams {
 ///
 /// This gets the parameters from the url and adds a job to the queue
 /// to be processed by the worker.
-#[post("/preview/{github_owner}/{github_repo}/{pull_request_number}/")]
+#[post("/submit/{github_owner}/{github_repo}/{pull_request_number}/")]
 async fn preview_handler(params: web::Path<(String, String, u64)>,
                          query_params: web::Query<PreviewParams>,
                          client: web::Data<Client>,
