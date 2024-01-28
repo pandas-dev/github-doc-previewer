@@ -3,6 +3,8 @@ Description=GitHub Documentation Previewer Service
 
 [Service]
 ExecStart=/usr/bin/doc-previewer
+User=web
+Group=web
 StandardOutput=journal
 StandardError=journal
 
