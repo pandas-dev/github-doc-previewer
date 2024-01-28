@@ -61,7 +61,7 @@ Currently only packages for Debian are provided. The package can be installed
 using the next command:
 
 ```
-curl -sLO https://github.com/pandas-dev/github-doc-previewer/releases/download/v0.3.0/doc-previewer_0.3.1-1_amd64.deb \
+curl -sLO https://github.com/pandas-dev/github-doc-previewer/releases/download/v0.3.1/doc-previewer_0.3.1-1_amd64.deb \
     && sudo dpkg -i doc-previewer_0.3.1-1_amd64.deb \
     && rm doc-previewer_0.3.1-1_amd64.deb
 ```
