@@ -60,14 +60,15 @@ fn extract_run_id_from_detail_url(url: &str) -> Result<u64, PreviewerError> {
 
 async fn run_id_from_commit(client: &Client,
                             base_api_url: &str,
-                            commit_reference: &str) -> Result<u64,
-                                                              PreviewerError> {
+                            commit_reference: &str,
+                            job_name: &str) -> Result<u64,
+                                                      PreviewerError> {
     let url = format!("{base_api_url}commits/{commit_reference}/check-runs");
     let json_obj = fetch_json(client, &url).await?;
 
     match json_obj["check_runs"]
         .as_array()
-        .and_then(|jobs| jobs.iter().find(|job| job["name"] == "Doc Build and Upload")) {
+        .and_then(|jobs| jobs.iter().find(|job| job["name"] == job_name)) {
             Some(job) => {
                 if let Some(detail_url) = job["details_url"].as_str() {
                     extract_run_id_from_detail_url(detail_url)
@@ -138,6 +139,7 @@ async fn download_artifact(client: &Client,
 pub async fn publish_artifact(client: &Client,
                               base_api_url: &str,
                               pull_request_number: u64,
+                              job_name: &str,
                               target_dir: &Path,
                               max_artifact_size: usize) -> Result<(),
                                                            PreviewerError> {
@@ -151,7 +153,8 @@ pub async fn publish_artifact(client: &Client,
 
     let run_id = run_id_from_commit(client,
                                     base_api_url,
-                                    &last_commit).await?;
+                                    &last_commit,
+                                    job_name).await?;
     log::info!("[PR {}] Run id: {}", pull_request_number, run_id);
 
     let artifact_url = artifact_url_from_run_id(client,
