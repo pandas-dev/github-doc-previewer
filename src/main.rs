@@ -52,7 +52,7 @@ async fn preview_handler(params: web::Path<(String, String, u64)>,
                         .join(pull_request_number.to_string());
 
     let publish_url = format!(
-        "{}{github_owner}/{github_repo}/{pull_request_number}",
+        "{}{github_owner}/{github_repo}/{pull_request_number}/",
         settings.server_url
     );
 
@@ -80,7 +80,9 @@ async fn preview_handler(params: web::Path<(String, String, u64)>,
                     }
                 }
             });
-            HttpResponse::Ok().body(publish_url)
+            HttpResponse::Ok().body(
+                format!("Website preview of this PR available at: {}", publish_url)
+            )
         }
         Err(e) => {
             log::error!("[PR {}] {:?}", pull_request_number, e);
@@ -113,7 +115,6 @@ async fn main() -> std::io::Result<()> {
 
         App::new()
             .wrap(Logger::default())
-            .wrap(Logger::new(&settings.log_format))
             .app_data(web::Data::new(client.clone()))
             .app_data(web::Data::new(settings.per_thread.clone()))
             .service(preview_handler)

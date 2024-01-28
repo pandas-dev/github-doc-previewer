@@ -20,10 +20,10 @@
 ///
 /// [log]
 /// level = "info"
-/// format = "%a %{User-Agent}i"
 /// ```
 use std::fs;
 use std::path::Path;
+use std::collections::HashSet;
 use serde_derive::Deserialize;
 
 const PREVIEWS_PATH: &str = "/var/doc-previewer";
@@ -37,7 +37,6 @@ const SERVER_URL: &str = "https://doc-previewer.pydata.org/";
 const GITHUB_ENDPOINT: &str = "https://api.github.com/repos/";
 
 const LOG_LEVEL: &str = "info";
-const LOG_FORMAT: &str = "%a %{User-Agent}i";
 
 #[derive(Deserialize)]
 pub struct TomlConfig {
@@ -65,8 +64,7 @@ struct TomlGitHub {
 
 #[derive(Deserialize)]
 struct TomlLog {
-    level: Option<String>,
-    format: Option<String>
+    level: Option<String>
 }
 
 /// Settings after filling the missing ones with default values.
@@ -77,7 +75,6 @@ pub struct Settings {
     pub github_token: String,
 
     pub log_level: String,
-    pub log_format: String,
 
     pub per_thread: SettingsPerThread
 }
@@ -92,7 +89,7 @@ pub struct SettingsPerThread {
     pub server_url: String,
 
     pub github_endpoint: String,
-    pub github_allowed_owners: Vec<String>
+    pub github_allowed_owners: HashSet<String>
 }
 
 impl Settings {
@@ -108,7 +105,6 @@ impl Settings {
             github_token: config.github.token.to_owned(),
 
             log_level: config.log.as_ref().and_then(|x| x.level.to_owned()).unwrap_or(LOG_LEVEL.to_owned()),
-            log_format: config.log.and_then(|x| x.format).unwrap_or(LOG_FORMAT.to_owned()),
 
             per_thread: SettingsPerThread {
                 previews_path: config.previews_path.unwrap_or(PREVIEWS_PATH.to_owned()),
@@ -118,29 +114,9 @@ impl Settings {
                 server_url: config.server.url.unwrap_or(SERVER_URL.to_owned()),
 
                 github_endpoint: config.github.endpoint.unwrap_or(GITHUB_ENDPOINT.to_owned()),
-                github_allowed_owners: config.github.allowed_owners
+                github_allowed_owners: config.github.allowed_owners.into_iter().collect()
             }
         };
-        // self.previews_path.unwrap_or(PREVIEWS_PATH.to_owned())
         settings
     }
 }
-
-/*
-        Settings {
-            previews_path: PREVIEWS_PATH.to_owned(),
-            retention_days: RETENTION_DAYS,
-            max_artifact_size: MAX_ARTIFACT_SIZE,
-
-            address: ADDRESS.to_owned(),
-            port: PORT,
-            publish_url: PUBLISH_URL.to_owned(),
-
-            github_token: GITHUB_TOKEN.to_owned(),
-            github_endpoint: GITHUB_ENDPOINT.to_owned(),
-
-            log_level: LOG_LEVEL.to_owned(),
-            log_format: LOG_FORMAT.to_owned()
-        }
-    }
-*/

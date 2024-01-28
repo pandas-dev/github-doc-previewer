@@ -61,9 +61,9 @@ Currently only packages for Debian are provided. The package can be installed
 using the next command:
 
 ```
-curl -sLO https://github.com/pandas-dev/github-doc-previewer/releases/download/v0.3.0/doc-previewer_0.3.0-1_amd64.deb \
-    && sudo dpkg -i doc-previewer_0.3.0-1_amd64.deb \
-    && rm doc-previewer_0.3.0-1_amd64.deb
+curl -sLO https://github.com/pandas-dev/github-doc-previewer/releases/download/v0.3.0/doc-previewer_0.3.1-1_amd64.deb \
+    && sudo dpkg -i doc-previewer_0.3.1-1_amd64.deb \
+    && rm doc-previewer_0.3.1-1_amd64.deb
 ```
 
 To start the service:
@@ -94,7 +94,6 @@ allowed_owners = [ "pandas-dev", "pydata" ]
 
 [log]
 level = "info"
-format = "%a %{User-Agent}i"
 ```
 
 All the fields are optional except for the GitHub token, which is required.

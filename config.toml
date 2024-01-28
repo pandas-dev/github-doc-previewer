@@ -14,4 +14,3 @@ allowed_owners = [ "pydata", "pandas-dev" ]
 
 [log]
 level = "info"
-format = "%a %{User-Agent}i"
