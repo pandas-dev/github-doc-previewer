@@ -1,0 +1,10 @@
+[Unit]
+Description=GitHub Documentation Previewer Service
+
+[Service]
+ExecStart=/usr/bin/doc-previewer
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
