@@ -17,7 +17,7 @@ runs:
         PREVIEWER_URL: "${{ inputs.previewer-server }}/preview/${{ github.repository }}/${{ github.event.issue.number }}/"
         ARTIFACT_JOB: ${{ inputs.artifact-job }}
       run: |
-        PREVIEWER_RESPONSE=$(curl -X POST -f --data-urlencode \"job=${ARTIFACT_JOB}\" ${PREVIEWER_URL})
+        PREVIEWER_RESPONSE=$(curl -X POST -f "${PREVIEWER_URL}?job=${ARTIFACT_JOB// /%20}")
         EXIT_CODE=$?
         echo "previewer-response=${PREVIEWER_RESPONSE}" | tee -a "$GITHUB_OUTPUT"
         exit ${EXIT_CODE}
