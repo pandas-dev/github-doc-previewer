@@ -63,7 +63,7 @@ async fn run_id_from_commit(client: &Client,
                             commit_reference: &str,
                             job_name: &str) -> Result<u64,
                                                       PreviewerError> {
-    let url = format!("{base_api_url}commits/{commit_reference}/check-runs");
+    let url = format!("{base_api_url}commits/{commit_reference}/check-runs?per_page=100");
     let json_obj = fetch_json(client, &url).await?;
 
     match json_obj["check_runs"]
